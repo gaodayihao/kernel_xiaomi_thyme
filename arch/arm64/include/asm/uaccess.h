@@ -109,6 +109,12 @@ static inline unsigned long __range_ok(const void __user *addr, unsigned long si
 #define access_ok(type, addr, size)	__range_ok(addr, size)
 #define user_addr_max			get_fs
 
+#undef access_ok
+#define __kona_access_ok_3(type, addr, size) __range_ok(addr, size)
+#define __kona_access_ok_2(addr, size)       __kona_access_ok_3(VERIFY_READ, addr, size)
+#define __kona_access_ok_pick(_1, _2, _3, name, ...) name
+#define access_ok(...) __kona_access_ok_pick(__VA_ARGS__, __kona_access_ok_3, __kona_access_ok_2)(__VA_ARGS__)
+
 #define _ASM_EXTABLE(from, to)						\
 	"	.pushsection	__ex_table, \"a\"\n"			\
 	"	.align		3\n"					\
